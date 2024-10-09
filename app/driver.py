@@ -27,9 +27,15 @@ def parse_arguments():
         required=True,
         help="Space-separated list of programming languages",
     )
-    parser.add_argument("--n-teams", type=int, help="Number of teams to form")
-    parser.add_argument("--size-min", type=int, help="Minimum size of each team")
-    parser.add_argument("--size-max", type=int, help="Maximum size of each team")
+    parser.add_argument(
+        "--n-teams", type=int, required=True, help="Number of teams to form"
+    )
+    parser.add_argument(
+        "--size-min", type=int, required=True, help="Minimum size of each team"
+    )
+    parser.add_argument(
+        "--size-max", type=int, required=True, help="Maximum size of each team"
+    )
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
