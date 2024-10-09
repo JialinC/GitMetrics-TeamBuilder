@@ -322,3 +322,123 @@ class UserContributionsCollection(Query):
 </td>
 </tr>
 </table>
+
+<table>
+<tr>
+<th>GraphQL</th>
+<th>Python</th>
+</tr>
+<tr>
+<td>
+
+```
+query {
+    rateLimit(dryRun: true) {
+        cost
+        limit
+        remaining
+        resetAt
+        used
+    }
+}
+```
+
+</td>
+<td>
+
+```python
+class RateLimit(Query):
+    def __init__(self, dryrun: bool) -> None:
+        super().__init__(
+            fields=[
+                QueryNode(
+                    NODE_RATE_LIMIT,
+                    args={ARG_DRYRUN: dryrun},
+                    fields=[
+                        FIELD_COST,
+                        FIELD_LIMIT,
+                        FIELD_REMAINING,
+                        FIELD_RESET_AT,
+                        FIELD_USED,
+                    ],
+                )
+            ]
+        )
+```
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<th>GraphQL</th>
+<th>Python</th>
+</tr>
+<tr>
+<td>
+
+```
+query {
+    user(login: "login") {
+        login
+    }
+    rateLimit(dryRun: true) {
+        cost
+        remaining
+        resetAt
+    }
+}
+```
+
+</td>
+<td>
+
+```python
+class QueryCost(Query):
+    def __init__(self, query: str, dryrun: bool) -> None:
+        if not query:
+            raise ValueError("Test query must not be empty")
+
+        super().__init__(
+            fields=[
+                query,
+                QueryNode(
+                    NODE_RATE_LIMIT,
+                    args={ARG_DRYRUN: dryrun},
+                    fields=[
+                        FIELD_COST,
+                        FIELD_REMAINING,
+                        FIELD_RESET_AT,
+                    ],
+                ),
+            ]
+        )
+```
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<th>GraphQL</th>
+<th>Python</th>
+</tr>
+<tr>
+<td>
+
+```
+
+```
+
+</td>
+<td>
+
+```python
+
+```
+
+</td>
+</tr>
+</table>
