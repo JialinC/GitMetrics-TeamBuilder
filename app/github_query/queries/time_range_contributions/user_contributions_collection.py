@@ -77,27 +77,15 @@ class UserContributionsCollection(Query):
         Returns:
             Counter: A collection counter aggregating the various types of contributions made by the user.
         """
-        raw_data = raw_data["user"]["contributionsCollection"]
+        raw_data = raw_data[NODE_USER][NODE_CONTRIBUTIONS_COLLECTION]
         contribution_collection = Counter(
             {
-                "res_con": raw_data[
-                    "restrictedContributionsCount"
-                ],  # Restricted contributions count.
-                "commit": raw_data[
-                    "totalCommitContributions"
-                ],  # Total commit contributions.
-                "issue": raw_data[
-                    "totalIssueContributions"
-                ],  # Total issue contributions.
-                "pr": raw_data[
-                    "totalPullRequestContributions"
-                ],  # Total pull request contributions.
-                "pr_review": raw_data[
-                    "totalPullRequestReviewContributions"
-                ],  # Total pull request review contributions.
-                "repository": raw_data[
-                    "totalRepositoryContributions"
-                ],  # Total repository contributions.
+                "res_con": raw_data[FIELD_RESTRICTED_CONTRIBUTIONS_COUNT],
+                "commit": raw_data[FIELD_TOTAL_COMMIT_CONTRIBUTIONS],
+                "issue": raw_data[FIELD_TOTAL_ISSUE_CONTRIBUTIONS],
+                "pr": raw_data[FIELD_TOTAL_PULL_REQUEST_CONTRIBUTIONS],
+                "pr_review": raw_data[FIELD_TOTAL_PULL_REQUEST_REVIEW_CONTRIBUTIONS],
+                "repository": raw_data[FIELD_TOTAL_REPOSITORY_CONTRIBUTIONS],
             }
         )
         return contribution_collection
