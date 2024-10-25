@@ -7,6 +7,26 @@ from app.github_query.github_graphql.authentication import (
     PersonalAccessTokenAuthenticator,
 )
 
+DEFAULT_METRICS = [
+    "duration",
+    "commits",
+    "comments",
+    "prs_issues",
+    "langs",
+    "code_size",
+    "repos",
+]
+
+INDEX_MAPPING = {
+    "duration": 1,
+    "commits": 2,
+    "comments": 3,
+    "prs_issues": 4,
+    "langs": 5,
+    "code_size": 6,
+    "repos": 7,
+}
+
 
 def parse_arguments():
     """
@@ -36,6 +56,15 @@ def parse_arguments():
     parser.add_argument(
         "--size-max", type=int, required=True, help="Maximum size of each team"
     )
+    parser.add_argument(
+        "--metrics",
+        nargs="*",
+        default=DEFAULT_METRICS,
+        help=(
+            "Space-separated list of metrics to use for team formation "
+            "(default: duration,commits,comments,prs_issues,langs,code_size,repos)"
+        ),
+    )
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
@@ -56,11 +85,31 @@ def read_usernames_from_csv(csv_file):
         list: List of usernames.
     """
     usernames = []
-    with open(csv_file, newline="", encoding="utf-8") as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            usernames.extend(row)
+    try:
+        with open(csv_file, newline="", encoding="utf-8") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                usernames.extend(row)
+    except FileNotFoundError:
+        print(f"Error: The file {csv_file} was not found.")
+    except csv.Error as e:
+        print(f"CSV error reading {csv_file}: {e}")
+    except IOError as e:
+        print(f"I/O error reading {csv_file}: {e}")
     return usernames
+
+
+def map_metrics_to_indices(metrics):
+    """
+    Map user selected metrics to their corresponding indices.
+
+    Args:
+        metrics (list): List of selected metrics.
+
+    Returns:
+        list: List of column indices.
+    """
+    return [INDEX_MAPPING[col] for col in metrics]
 
 
 def main():
@@ -91,7 +140,10 @@ def main():
     miner = UserMetricsMiner(clt)
     data = []
     for username in usernames:
-        data.append(miner.mine(username, args.languages))
+        user_data = miner.mine(username, args.languages)
+        column_indices = map_metrics_to_indices(args.metrics)
+        filtered_data = [user_data[0]] + [user_data[i] for i in column_indices]
+        data.append(filtered_data)
 
     teams = TeamBuilder(data).form_teams(
         n_teams=args.n_teams, size_min=args.size_min, size_max=args.size_max
